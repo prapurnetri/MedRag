@@ -1,0 +1,36 @@
+# MedRAG — requirements.txt
+# Install with: pip install -r requirements.txt
+
+# Core LLM + RAG
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-openai==0.1.23
+openai==1.40.0
+
+# Vector store
+faiss-cpu==1.8.0
+
+# Embeddings
+sentence-transformers==3.0.1
+
+# Sparse retrieval (BM25)
+rank-bm25==0.2.2
+
+# PDF processing
+pypdf==4.3.1
+
+# Tokenization
+tiktoken==0.7.0
+
+# Evaluation
+ragas==0.1.21
+datasets==2.21.0
+
+# App
+streamlit==1.37.0
+
+# Utilities
+python-dotenv==1.0.1
+numpy==1.26.4
+pandas==2.2.2
+tqdm==4.66.5

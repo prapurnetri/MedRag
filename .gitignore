@@ -1,0 +1,24 @@
+# Environment
+.env
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Data (too large for GitHub)
+data/faiss_index/
+data/bm25_index.pkl
+data/chunks.pkl
+
+# Papers (PDFs — don't commit copyrighted papers)
+data/papers/
+
+# Evaluation outputs
+evaluation/results.csv
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
