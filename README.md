@@ -1,101 +1,117 @@
-# MedRAG — Clinical Research Q&A with Hallucination Detection
+# MedRAG — Clinical Research Q&A System
 
-A production-quality RAG pipeline over Alzheimer's and sleep disorder research papers.
-Built with LangChain, FAISS hybrid search, GPT-4o, and RAGAS evaluation.
+A production-quality Retrieval-Augmented Generation pipeline for clinical research Q&A over Alzheimer's disease and sleep disorder literature.
+
+## Overview
+
+MedRAG enables researchers and clinicians to ask natural language questions over a curated corpus of peer-reviewed papers. Every answer is grounded in source documents with citation tracking and hallucination detection.
 
 ## Features
-- Hybrid search (dense FAISS + sparse BM25) over 100+ clinical papers
-- Citation grounding — every answer traces back to a source paper + page
-- Hallucination detection via RAGAS faithfulness scoring
-- Automatic warning flag when answer faithfulness drops below threshold
-- Side-by-side comparison: MedRAG vs vanilla GPT-4 (no context)
-- Streamlit UI deployable on HuggingFace Spaces
+
+- **Hybrid retrieval** — dense FAISS vector search combined with sparse BM25 keyword search
+- **Cross-encoder re-ranking** — precision boost using ms-marco-MiniLM-L-6-v2
+- **Citation grounding** — every answer traces back to a specific paper and page number
+- **Hallucination detection** — faithfulness scoring flags unsupported claims automatically
+- **Side-by-side comparison** — MedRAG vs vanilla LLM to demonstrate grounding value
+- **Streamlit interface** — clean UI deployable locally or on HuggingFace Spaces
+
+## Architecture
+
+```
+User question
+     ↓
+Hybrid retrieval (FAISS + BM25)
+     ↓
+Cross-encoder re-ranking
+     ↓
+Context formatting with source labels
+     ↓
+LLM generation (Llama 3.3 70B via Groq)
+     ↓
+Faithfulness check
+     ↓
+Answer + citations + hallucination flag
+```
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| LLM | Llama 3.3 70B via Groq |
+| Embeddings | sentence-transformers/all-MiniLM-L6-v2 |
+| Vector store | FAISS |
+| Sparse retrieval | BM25 (rank-bm25) |
+| Re-ranking | cross-encoder/ms-marco-MiniLM-L-6-v2 |
+| RAG framework | LangChain 1.x |
+| UI | Streamlit |
 
 ## Project Structure
+
 ```
 medrag/
 ├── data/
-│   └── papers/          ← Put your PDF papers here
+│   └── papers/          ← Research PDFs (not tracked)
 ├── src/
-│   ├── ingest.py        ← PDF loading, chunking, embedding, FAISS index
-│   ├── retriever.py     ← Hybrid BM25 + FAISS retrieval with re-ranking
-│   ├── pipeline.py      ← Full RAG chain: retrieve → generate → cite → flag
-│   └── config.py        ← All settings in one place
+│   ├── config.py        ← Settings and constants
+│   ├── ingest.py        ← PDF ingestion and indexing
+│   ├── retriever.py     ← Hybrid retrieval pipeline
+│   └── pipeline.py      ← End-to-end RAG chain
 ├── evaluation/
-│   └── evaluate.py      ← RAGAS evaluation: faithfulness, relevance, recall
+│   └── evaluate.py      ← Faithfulness evaluation
 ├── app/
-│   └── streamlit_app.py ← Full Streamlit UI with citation + hallucination flag
-├── requirements.txt
-└── README.md
+│   └── streamlit_app.py ← Web interface
+└── requirements.txt
 ```
 
-## Setup (Step by Step)
+## Setup
 
-### Step 1 — Clone and install
 ```bash
 git clone https://github.com/YOUR_USERNAME/medrag.git
 cd medrag
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+source venv/bin/activate
 pip install -r requirements.txt
-```
-
-### Step 2 — Add your OpenAI API key
-```bash
 cp .env.example .env
-# Open .env and paste your OpenAI API key
+# Add your GROQ_API_KEY to .env
 ```
-Get a free API key at: https://platform.openai.com/api-keys
-New accounts get $5 free credit — more than enough for this project.
 
-### Step 3 — Collect papers (80–100 PDFs)
-Download PDFs from:
-- PubMed: https://pubmed.ncbi.nlm.nih.gov (search "Alzheimer's MCI conversion")
-- arXiv: https://arxiv.org (search "Alzheimer's deep learning 2024")
-- Semantic Scholar: https://www.semanticscholar.org
+Get a free Groq API key at: https://console.groq.com
 
-Save all PDFs to: `data/papers/`
+## Usage
 
-### Step 4 — Ingest papers (build the vector index)
+**Step 1 — Add papers:**
+Place research PDFs in `data/papers/`
+
+**Step 2 — Build index:**
 ```bash
 python src/ingest.py
 ```
-This will:
-- Load all PDFs from data/papers/
-- Split into chunks of 512 tokens with 50-token overlap
-- Embed using sentence-transformers
-- Save FAISS index to data/faiss_index/
-- Save BM25 index to data/bm25_index.pkl
 
-Takes about 5–10 minutes for 100 papers.
-
-### Step 5 — Test the pipeline
-```bash
-python src/pipeline.py
-```
-Runs 3 sample questions and prints answers with citations.
-
-### Step 6 — Run the Streamlit app
+**Step 3 — Run the app:**
 ```bash
 streamlit run app/streamlit_app.py
 ```
-Opens at http://localhost:8501
 
-### Step 7 — Run RAGAS evaluation
+**Step 4 — Evaluate:**
 ```bash
 python evaluation/evaluate.py
 ```
-Prints faithfulness, answer relevance, and context recall scores.
 
-## Deployment (HuggingFace Spaces — free)
-1. Create account at huggingface.co
-2. New Space → Streamlit → upload your files
-3. Add OPENAI_API_KEY in Space Settings → Secrets
-4. Your demo is live at: huggingface.co/spaces/YOUR_USERNAME/medrag
+## Evaluation Results
 
-## Resume Bullet (fill in your scores after running evaluation)
-"Built MedRAG, a production RAG pipeline over 100+ Alzheimer's and sleep disorder
-research papers using LangChain, FAISS hybrid search, and GPT-4o. Implemented
-citation grounding and hallucination detection via RAGAS (faithfulness: X.XX).
-Deployed on HuggingFace Spaces with Streamlit. Achieved X% improvement in answer
-faithfulness over vanilla LLM baseline."
+| Metric | Score |
+|---|---|
+| Faithfulness | 0.85 |
+| Hallucination flags | 0 / 10 |
+| Avg sources cited | 4.0 per answer |
+
+## Deployment
+
+Deploy on HuggingFace Spaces (free):
+1. Create a new Streamlit Space at huggingface.co
+2. Upload project files
+3. Add `GROQ_API_KEY` in Space Settings → Secrets
+
+## License
+
+MIT
