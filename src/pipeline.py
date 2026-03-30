@@ -72,24 +72,35 @@ Answer based strictly on the context above. Cite sources as [Source N]."""
         return response.content
 
     def _faithfulness_check(self, answer: str, context: str) -> float:
-        prompt = f"""Evaluate whether this AI answer is faithful to the source context.
+        prompt = f"""You are a strict evaluator. Score ONLY based on evidence present in the context.
 
-Source context:
-{context[:3000]}
+Context from research papers:
+{context[:2000]}
 
-AI Answer:
+AI Answer to evaluate:
 {answer}
 
-Rate faithfulness from 0.0 to 1.0:
-- 1.0 = Every claim directly supported by context
-- 0.5 = Some claims supported, some from outside knowledge
-- 0.0 = Answer ignores or contradicts context
+Instructions:
+1. Read each claim in the answer carefully.
+2. Check whether each claim is directly supported or paraphrased from the context above.
+3. Count how many claims are supported vs invented from outside knowledge.
 
-Respond with ONLY a single number like 0.85. Nothing else."""
+Scoring guide:
+- 1.0 = every single claim is found in the context
+- 0.9 = almost all claims supported, tiny extrapolation
+- 0.8 = most claims supported, minor outside knowledge
+- 0.7 = majority supported but some claims not in context
+- 0.6 = roughly half supported, half invented
+- 0.4 = few claims supported, mostly outside knowledge
+- 0.2 = almost no claims from context
+- 0.0 = answer completely ignores the context
+
+Be strict. Do not give 0.85 by default. Evaluate carefully and give a specific score.
+Respond with ONLY a decimal number. Examples: 0.92, 0.74, 0.61, 0.88"""
 
         response = self.llm.invoke([HumanMessage(content=prompt)])
         try:
-            match = re.search(r"\d+\.?\d*", response.content.strip())
+            match = re.search(r"0\.\d+|1\.0", response.content.strip())
             score = float(match.group()) if match else 0.5
             return min(max(score, 0.0), 1.0)
         except Exception:
