@@ -1,3 +1,5 @@
+---
+
 title: MedRAG
 emoji: 🧠
 colorFrom: green
@@ -5,6 +7,8 @@ colorTo: blue
 sdk: docker
 app_file: app/streamlit_app.py
 pinned: false
+
+---
 
 # MedRAG — Clinical Research Q&A System
 
