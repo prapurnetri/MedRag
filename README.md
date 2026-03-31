@@ -5,7 +5,7 @@ emoji: 🧠
 colorFrom: green
 colorTo: blue
 sdk: docker
-app_file: app/streamlit_app.py
+app_file: app.py
 pinned: false
 
 ---

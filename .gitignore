@@ -23,3 +23,8 @@ evaluation/results.csv
 .DS_Store
 Thumbs.db
 references/
+__pycache__/
+evaluation/results.csv
+__pycache__/
+evaluation/results.csv
+{data
