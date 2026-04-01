@@ -54,7 +54,7 @@ with st.sidebar:
     - Cross-encoder re-ranking
     - Llama 3.3 70B via Groq
     - Citation grounding
-    - Hallucination detection (faithfulness: **0.85**)
+    - Hallucination detection (faithfulness: **0.88**)
     """)
 
     st.divider()
