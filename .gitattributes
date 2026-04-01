@@ -1,0 +1,6 @@
+data/bm25_index.pkl filter=lfs diff=lfs merge=lfs -text
+data/chunks.pkl filter=lfs diff=lfs merge=lfs -text
+data/faiss_index/index.faiss filter=lfs diff=lfs merge=lfs -text
+data/faiss_index/index.pkl filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+*.faiss filter=lfs diff=lfs merge=lfs -text
